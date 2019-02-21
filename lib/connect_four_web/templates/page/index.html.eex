@@ -1,0 +1,10 @@
+<div class="row">
+  <div class="column">
+    <h1>Connect Four</h1>
+    <%= form_for @conn, "/game", fn f -> %>
+      <p>Lobby Name: <%= text_input f, :game %></p>
+      <p>Your UserName: <%= text_input f, :user %></p>
+      <p><%= submit "Connect to the game" %>
+    <% end %>
+  </div>
+</div>
