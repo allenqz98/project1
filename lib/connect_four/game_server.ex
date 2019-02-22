@@ -24,25 +24,24 @@ defmodule ConnectFour.GameServer do
     GenServer.call(reg(name), {:view, name, user})
   end
 
-
   def add_user(name, "player", user) do
-    GenServer.call(reg(name), {:add, name, user})
+    GenServer.call(reg(name), {:add_user, name, user})
   end
 
   def remove_user(name, "player", user) do
-    GenServer.call(reg(name), {:remove, name, user})
+    GenServer.call(reg(name), {:remove_user, name, user})
   end
 
   def move(name, user, index) do
     GenServer.call(reg(name), {:move, user, index})
   end
 
-
   def init(name) do
     {:ok, name}
   end
 
   def handle_call({:view, name, user}, _from, game) do
+    game = ConnectFour.Game.client_view(game)
     {:reply, game, game}
   end
 
@@ -57,7 +56,7 @@ defmodule ConnectFour.GameServer do
   end
 
   def handle_call({:move, user, index}, _from, game) do
-    game = ConnectFour.Game.move(game, index, player)
+    game = ConnectFour.Game.move(game, index, user)
     {:reply, game, game}
   end
 end

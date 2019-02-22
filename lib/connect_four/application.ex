@@ -9,8 +9,9 @@ defmodule ConnectFour.Application do
     # List all child processes to be supervised
     children = [
       # Start the endpoint when the application starts
-      ConnectFourWeb.Endpoint
-      # ConnectFour.Game
+      ConnectFourWeb.Endpoint,
+      ConnectFour.GameSup,
+      ConnectFour.GameServer
       # Starts a worker by calling: ConnectFour.Worker.start_link(arg)
       # {ConnectFour.Worker, arg},
     ]
