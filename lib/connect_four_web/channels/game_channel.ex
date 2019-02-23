@@ -12,13 +12,10 @@ defmodule ConnectFourWeb.GamesChannel do
       socket = assign(socket, :game, game)
       |> assign(:user, user)
       GameServer.add_user(game,"player",user)
-
       view = GameServer.view(game, socket.assigns[:user])
       {:ok, %{"join" => game, "game" => view}, socket}
 
   end
-
-
 
 
   def handle_in("move", %{"index" => index}, socket) do

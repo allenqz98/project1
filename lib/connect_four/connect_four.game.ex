@@ -40,12 +40,14 @@ defmodule ConnectFour.Game do
 
 
   def move(game, index, player) do
+    if length(game.players) < 2 do
+      game
+
+    else
     player_num = get_player_num(game, player)
     x = Enum.at(index, 0)
     y = Enum.at(index, 1)
-    IO.puts("hi there")
-    IO.inspect player_num
-    if Enum.at(Enum.at(game.board, x),y) == 0 do
+    if Enum.at(Enum.at(game.board, y),x) == 0 do
       cond do
         player_num == 1 && game.cur_player == 1 ->
           game = Map.put(game, :board, new_board(game, x, y, 1))
@@ -61,6 +63,7 @@ defmodule ConnectFour.Game do
     else
       game
     end
+  end
   end
 
   def get_player_num(game, player) do
@@ -79,8 +82,11 @@ defmodule ConnectFour.Game do
 
 
   def check_win(game, index) do
+    IO.puts("checking win")
     x = Enum.at(index, 0)
     y = Enum.at(index, 1)
+    IO.puts(x)
+    IO.puts(y)
     check_horizontal(game, x, y) || check_vertical(game, x, y) ||
     check_diagonal(game,x, y)
   end

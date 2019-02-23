@@ -28,6 +28,7 @@ class Starter extends React.Component {
   }
 
   got_view(view) {
+    console.log("got view")
     console.log(view)
     this.setState(view.game);
   }
@@ -36,7 +37,7 @@ class Starter extends React.Component {
   on_move(i) {
     console.log(i)
     var resp = this.channel.push("move", {index: i})
-                           .receive("ok", this.got_view.bind(this));
+                           // .receive("ok", this.got_view.bind(this));
   }
 
 
@@ -48,6 +49,17 @@ class Starter extends React.Component {
   leave() {
     this.channel.push("remove_user",{user:window.userName});
     window.location = "/";
+  }
+
+  cur_player_name(){
+    console.log("getting cur player name");
+    const players = this.state.players;
+    const cur_player = this.state.cur_player;
+    for(i=0; i<players.length; i++) {
+      if (players[i][0]==cur_player) {
+        return players[i][1]
+      }
+    }
   }
 
 
@@ -64,11 +76,7 @@ class Starter extends React.Component {
             <Users players={players} />
           </ul>
         </div>
-        <div>
-          <ul>
-            <p>Current Player's turn:{cur_player}</p>
-          </ul>
-        </div>
+        <div>Current Player's turn:{this.cur_player_name.bind(this)}</div>
         <div className="board container">
           <div className="row">
              {board[0].map((piece, i) =>
