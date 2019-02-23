@@ -23,6 +23,8 @@ class Starter extends React.Component {
         .receive("ok", this.got_view.bind(this))
         .receive("error", resp => {console.log("Unable to join", resp); })
 
+    this.channel.on("update", this.got_view.bind(this));
+
   }
 
   got_view(view) {
@@ -44,19 +46,27 @@ class Starter extends React.Component {
   }
 
   leave() {
-    this.channel.push("remove_user", {});
+    this.channel.push("remove_user",{user:window.userName});
+    window.location = "/";
   }
 
 
   render() {
     const board = this.state.board;
     const players = this.state.players;
+    const cur_player = this.state.cur_player;
+    const finished = this.state.finished;
     return(
       <div className="column">
         <h3> Player(s){players.length}/2 </h3>
         <div>
           <ul>
             <Users players={players} />
+          </ul>
+        </div>
+        <div>
+          <ul>
+            <p>Current Player's turn:{cur_player}</p>
           </ul>
         </div>
         <div className="board container">

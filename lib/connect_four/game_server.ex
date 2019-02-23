@@ -55,7 +55,7 @@ defmodule ConnectFour.GameServer do
     {:reply, game, game}
   end
 
-  def handle_call({:move, user, index}, _from, game) do
+  def handle_call({:move, index, user}, _from, game) do
     game = ConnectFour.Game.move(game, index, user)
     {:reply, game, game}
   end

@@ -5,7 +5,7 @@ defmodule ConnectFour.Game do
       players: [],
       cur_player: 1,
       finished: 0,
-      board: Enum.chunk([1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],7),
+      board: Enum.chunk([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],7),
     }
   end
 
@@ -21,10 +21,12 @@ defmodule ConnectFour.Game do
 
   def add_user(game, user) do
     players = game.players
-    cond do
-      length(players) == 0 -> players = Map.put(game, :players, [[1, user]])
-      Enum.at(Enum.at(players, 0),0) == 1 -> Map.put(game, :players, players ++ [[2, user]])
-      Enum.at(Enum.at(players, 0),0) == 2 -> Map.put(game, :players, players ++ [[1, user]])
+    if length(players) < 2 do
+      cond do
+        length(players) == 0 -> players = Map.put(game, :players, [[1, user]])
+        Enum.at(Enum.at(players, 0),0) == 1 -> Map.put(game, :players, players ++ [[2, user]])
+        Enum.at(Enum.at(players, 0),0) == 2 -> Map.put(game, :players, players ++ [[1, user]])
+      end
     end
   end
 
@@ -41,25 +43,20 @@ defmodule ConnectFour.Game do
     player_num = get_player_num(game, player)
     x = Enum.at(index, 0)
     y = Enum.at(index, 1)
-    IO.puts(x)
-    IO.puts(y)
-    IO.puts(Enum.at(Enum.at(game.board, x),0))
-    IO.puts(Enum.at(Enum.at(game.board, x),1))
-    IO.puts(Enum.at(Enum.at(game.board, x),2))
-    IO.puts(Enum.at(Enum.at(game.board, x),3))
-    IO.puts(Enum.at(Enum.at(game.board, x),4))
-
+    IO.puts("hi there")
+    IO.inspect player_num
     if Enum.at(Enum.at(game.board, x),y) == 0 do
       cond do
         player_num == 1 && game.cur_player == 1 ->
-          IO.puts("moving1")
           game = Map.put(game, :board, new_board(game, x, y, 1))
           game = Map.put(game, :cur_player , 2)
           game = Map.put(game, :finished , check_win(game,index))
         player_num == 2 && game.cur_player == 2 ->
-          IO.puts("moving2")
           game = Map.put(game, :board, new_board(game, x, y, 2))
+          game = Map.put(game, :cur_player , 1)
           game = Map.put(game, :finished , check_win(game,index))
+        true ->
+          game
       end
     else
       game
@@ -68,13 +65,16 @@ defmodule ConnectFour.Game do
 
   def get_player_num(game, player) do
     players = game.players
-    [result, _] = Enum.find(players, fn [_, username] -> player == username end)
-    result
+    val= Enum.find(players, fn [_, username] -> player == username end)
+      if length(val)!=0 do
+        [result , _] = val
+        result
+      end
   end
 
   def new_board(game, x, y, piece) do
-    Enum.chunk([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],7)
-
+    new_row = Enum.at(game.board, y)|>List.replace_at(x, piece)
+    List.replace_at(game.board, y, new_row)
   end
 
 
@@ -105,101 +105,101 @@ defmodule ConnectFour.Game do
     else
       if Enum.at(Enum.at(game.board, y), x - 1) ==  player do
         check_left(game, x - 1, y, acc + 1)
-      else
-        acc
-      end
-    end
-  end
+          else
+            acc
+            end
+          end
+        end
 
-  def check_right(game,x,y,acc) do
-    player = game.cur_player
-    if x == 6 do
-      acc
-    else
-      if Enum.at(Enum.at(game.board, y), x + 1) ==  player do
-        check_right(game, x + 1, y, acc + 1)
-      else
-        acc
-      end
-    end
-  end
+        def check_right(game,x,y,acc) do
+          player = game.cur_player
+          if x == 6 do
+            acc
+          else
+            if Enum.at(Enum.at(game.board, y), x + 1) ==  player do
+              check_right(game, x + 1, y, acc + 1)
+            else
+              acc
+            end
+          end
+        end
 
-  def check_top(game,x,y,acc) do
-    player = game.cur_player
-    if y == 0 do
-      acc
-    else
-      if Enum.at(Enum.at(game.board, y - 1), x) ==  player do
-        check_top(game, x, y - 1, acc + 1)
-      else
-        acc
-      end
-    end
-  end
+        def check_top(game,x,y,acc) do
+          player = game.cur_player
+          if y == 0 do
+            acc
+          else
+            if Enum.at(Enum.at(game.board, y - 1), x) ==  player do
+              check_top(game, x, y - 1, acc + 1)
+            else
+              acc
+            end
+          end
+        end
 
-  def check_bot(game,x,y,acc) do
-    player = game.cur_player
-    if y == 5 do
-      acc
-    else
-      if Enum.at(Enum.at(game.board, y + 1), x) ==  player do
-        check_bot(game, x, y + 1, acc + 1)
-      else
-        acc
-      end
-    end
-  end
-  def check_bot_left(game,x,y,acc) do
-    player = game.cur_player
-    if y == 5 or x == 0 do
-      acc
-    else
-      if Enum.at(Enum.at(game.board, y + 1), x - 1) ==  player do
-        check_bot_left(game, x - 1, y + 1, acc + 1)
-      else
-        acc
-      end
-    end
-  end
-  def check_bot_right(game,x,y,acc) do
-    player = game.cur_player
-    if y == 5 or x == 6 do
-      acc
-    else
-      if Enum.at(Enum.at(game.board, y + 1), x + 1) ==  player do
-        check_bot_right(game, x + 1, y + 1, acc + 1)
-      else
-        acc
-      end
-    end
-  end
-  def check_top_right(game,x,y,acc) do
-    player = game.cur_player
-    if y == 0 or x == 6 do
-      acc
-    else
-      if Enum.at(Enum.at(game.board, y - 1), x + 1) ==  player do
-        check_top_right(game, x + 1, y - 1, acc + 1)
-      else
-        acc
-      end
-    end
-  end
-  def check_top_left(game,x,y,acc) do
-    player = game.cur_player
-    if y == 0 or x == 0 do
-      acc
-    else
-      if Enum.at(Enum.at(game.board, y - 1), x - 1) ==  player do
-        check_top_left(game, x - 1, y - 1, acc + 1)
-      else
-        acc
-      end
-    end
-  end
-
-
+        def check_bot(game,x,y,acc) do
+          player = game.cur_player
+          if y == 5 do
+            acc
+          else
+            if Enum.at(Enum.at(game.board, y + 1), x) ==  player do
+              check_bot(game, x, y + 1, acc + 1)
+            else
+              acc
+            end
+          end
+        end
+        def check_bot_left(game,x,y,acc) do
+          player = game.cur_player
+          if y == 5 or x == 0 do
+            acc
+          else
+            if Enum.at(Enum.at(game.board, y + 1), x - 1) ==  player do
+              check_bot_left(game, x - 1, y + 1, acc + 1)
+            else
+              acc
+            end
+          end
+        end
+        def check_bot_right(game,x,y,acc) do
+          player = game.cur_player
+          if y == 5 or x == 6 do
+            acc
+          else
+            if Enum.at(Enum.at(game.board, y + 1), x + 1) ==  player do
+              check_bot_right(game, x + 1, y + 1, acc + 1)
+            else
+              acc
+            end
+          end
+        end
+        def check_top_right(game,x,y,acc) do
+          player = game.cur_player
+          if y == 0 or x == 6 do
+            acc
+          else
+            if Enum.at(Enum.at(game.board, y - 1), x + 1) ==  player do
+              check_top_right(game, x + 1, y - 1, acc + 1)
+            else
+              acc
+            end
+          end
+        end
+        def check_top_left(game,x,y,acc) do
+          player = game.cur_player
+          if y == 0 or x == 0 do
+            acc
+          else
+            if Enum.at(Enum.at(game.board, y - 1), x - 1) ==  player do
+              check_top_left(game, x - 1, y - 1, acc + 1)
+            else
+              acc
+            end
+          end
+        end
 
 
 
-end
+
+
+      end
